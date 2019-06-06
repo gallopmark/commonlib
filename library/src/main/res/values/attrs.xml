@@ -1,34 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CircularProgressView">
-        <attr name="border_Width" format="dimension" />
-        <attr name="colorSequence" format="reference" />
-        <attr name="sweepAnimationDurationMillis" format="integer" />
-        <attr name="angleAnimationDurationMillis" format="integer" />
-        <attr name="minSweepAngle" format="integer" />
+        <attr name="cpv_progress" format="float" />
+        <attr name="cpv_maxProgress" format="float" />
+        <attr name="cpv_animDuration" format="integer" />
+        <attr name="cpv_animSwoopDuration" format="integer" />
+        <attr name="cpv_animSyncDuration" format="integer" />
+        <attr name="cpv_color" format="color" />
+        <attr name="cpv_thickness" format="dimension" />
+        <attr name="cpv_indeterminate" format="boolean" />
+        <attr name="cpv_animAutoStart" format="boolean" />
+        <attr name="cpv_animSteps" format="integer" />
+        <attr name="cpv_startAngle" format="float" />
     </declare-styleable>
-
-    <dimen name="circular_default_border_width">4dp</dimen>
-
-    <array name="circular_default_color_sequence">
-        <item>@color/circular_green</item>
-        <item>@color/circular_green</item>
-        <item>@color/circular_green</item>
-        <item>@color/circular_green</item>
-    </array>
-    <array name="circular_loading_color_sequence">
-        <item>@color/circular_white</item>
-        <item>@color/circular_white</item>
-        <item>@color/circular_white</item>
-        <item>@color/circular_white</item>
-    </array>
-    <integer name="circular_default_sweepAnimationDuration">900</integer>
-    <integer name="circular_default_angleAnimationDurationMillis">2000</integer>
-    <integer name="circular_default_miniSweepAngle">30</integer>
-
-    <color name="circular_red">#F90101</color>
-    <color name="circular_blue">#0266C8</color>
-    <color name="circular_yellow">#F2B50F</color>
-    <color name="circular_green">#00933B</color>
-    <color name="circular_white">#ffffff</color>
+    <color name="cpv_default_color">#2196F3</color>
+    <dimen name="cpv_default_thickness">4dp</dimen>
+    <integer name="cpv_default_progress">0</integer>
+    <integer name="cpv_default_max_progress">100</integer>
+    <bool name="cpv_default_is_indeterminate">false</bool>
+    <bool name="cpv_default_anim_autoStart">true</bool>
+    <integer name="cpv_default_anim_duration">4000</integer>
+    <integer name="cpv_default_anim_swoop_duration">5000</integer>
+    <integer name="cpv_default_anim_sync_duration">500</integer>
+    <integer name="cpv_default_anim_steps">3</integer>
+    <integer name="cpv_default_start_angle">-90</integer>
 </resources>
