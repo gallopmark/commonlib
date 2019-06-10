@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -164,7 +165,7 @@ public class SystemTintHelper {
             ViewGroup mContentView = window.findViewById(Window.ID_ANDROID_CONTENT);
             View mChildView = mContentView.getChildAt(0);
             if (mChildView != null) {
-                mChildView.setFitsSystemWindows(false);
+                mChildView.setFitsSystemWindows(true);
                 mChildView.requestApplyInsets();
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//4.4-5.0
@@ -199,9 +200,14 @@ public class SystemTintHelper {
         return statusView;
     }
 
-    private static int getStatusBarHeight(Context context) {
+    static int getStatusBarHeight(Context context) {
         Resources resources = context.getResources();
-        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = 0;
+        try {
+            resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return resources.getDimensionPixelSize(resourceId);
     }
 
@@ -225,5 +231,20 @@ public class SystemTintHelper {
                 window.setAttributes(attributes);
             }
         }
+    }
+
+    /**
+     * Subtract the top margin size equals status bar's height for view.
+     * 当设置全屏沉浸状态栏时，一般使用此方法将toolbar等设置topMargin为statusHeight
+     *
+     * @param view The view.
+     */
+    static void addMarginTopEqualStatusBarHeight(Context context, @NonNull View view) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.setMargins(layoutParams.leftMargin,
+                layoutParams.topMargin + getStatusBarHeight(context),
+                layoutParams.rightMargin,
+                layoutParams.bottomMargin);
     }
 }

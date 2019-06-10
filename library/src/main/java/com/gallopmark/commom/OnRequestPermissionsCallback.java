@@ -1,7 +1,9 @@
 package com.gallopmark.commom;
 
-public interface OnRequestPermissionsCallback {
-    void onGranted();
+import android.support.annotation.NonNull;
 
-    void onDenied(boolean isProhibit);
+public interface OnRequestPermissionsCallback {
+    void onGranted(int requestCode, @NonNull String[] permissions);
+
+    void onDenied(int requestCode, @NonNull String[] permissions, boolean isProhibit);
 }

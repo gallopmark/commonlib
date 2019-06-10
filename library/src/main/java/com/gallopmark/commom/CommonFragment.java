@@ -31,9 +31,9 @@ public abstract class CommonFragment extends AppCompatFragment {
         loadDataStart();
     }
 
-    /*if you use kotlin, No need to use findViewById*/
     protected abstract void bindView(View view);
 
+    /*if you use kotlin, No need to use findViewById*/
     protected <T extends View> T findViewById(int id) {
         if (mContentView == null) throw new NullPointerException("mContentView not initialized");
         return mContentView.findViewById(id);

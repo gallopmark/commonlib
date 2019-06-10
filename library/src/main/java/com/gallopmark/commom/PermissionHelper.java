@@ -10,7 +10,7 @@ import android.support.v4.app.Fragment;
 /*权限回调处理*/
 final class PermissionHelper {
 
-    static void convert(Object target, @NonNull String[] permissions, @NonNull int[] grantResults, @Nullable OnRequestPermissionsCallback requestCallback) {
+    static void convert(Object target, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, @Nullable OnRequestPermissionsCallback requestCallback) {
         boolean allGranted = true;
         for (int result : grantResults) {
             if (result != PackageManager.PERMISSION_GRANTED) {
@@ -20,7 +20,7 @@ final class PermissionHelper {
         }
         if (allGranted) {
             if (requestCallback != null) {
-                requestCallback.onGranted();
+                requestCallback.onGranted(requestCode, permissions);
             }
         } else {
             boolean isProhibit = false;
@@ -41,7 +41,7 @@ final class PermissionHelper {
                 }
             }
             if (requestCallback != null) {
-                requestCallback.onDenied(isProhibit);
+                requestCallback.onDenied(requestCode, permissions, isProhibit);
             }
         }
     }

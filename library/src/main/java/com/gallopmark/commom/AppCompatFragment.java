@@ -25,6 +25,10 @@ public abstract class AppCompatFragment extends Fragment {
     /*全局mActivity避免getActivity空指针异常*/
     protected Activity mActivity;
 
+    /*startActivityForResult请求码*/
+    private int mActivityRequestCode;
+    /*activity result回调*/
+    private OnActivityResultCallback mActivityResultCallback;
     /*权限申请请求码*/
     private int requestPermissionCode;
     /*权限申请回调*/
@@ -90,9 +94,7 @@ public abstract class AppCompatFragment extends Fragment {
 
     /*获取手机状态栏高度*/
     protected int getStatusBarHeight() {
-        Resources resources = mActivity.getResources();
-        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
-        return resources.getDimensionPixelSize(resourceId);
+        return SystemTintHelper.getStatusBarHeight(mActivity);
     }
 
     /*获取屏幕宽度*/
@@ -129,12 +131,14 @@ public abstract class AppCompatFragment extends Fragment {
         return new Intent(getActivity(), clz);
     }
 
-    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode) {
-        startActivityForResult(clz, requestCode, null);
+    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode, OnActivityResultCallback resultCallback) {
+        startActivityForResult(clz, requestCode, null, resultCallback);
     }
 
-    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode, @Nullable Bundle options) {
+    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode, @Nullable Bundle options, OnActivityResultCallback resultCallback) {
         if (getActivity() == null) return;
+        this.mActivityRequestCode = requestCode;
+        this.mActivityResultCallback = resultCallback;
         Intent intent = obtainIntent(clz);
         if (options != null) {
             intent.putExtras(options);
@@ -160,7 +164,52 @@ public abstract class AppCompatFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == requestPermissionCode) {
-            PermissionHelper.convert(this, permissions, grantResults, requestCallback);
+            PermissionHelper.convert(this, requestCode, permissions, grantResults, requestCallback);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == mActivityRequestCode && mActivityResultCallback != null) {
+            if (resultCode == Activity.RESULT_OK) {
+                mActivityResultCallback.onResultOk(requestCode, data);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                mActivityResultCallback.onResultCanceled(requestCode, data);
+            }
+        }
+    }
+
+    /*显示loading加载框*/
+    protected void showLoadingDialog() {
+        showLoadingDialog("");
+    }
+
+    /*显示带message的加载框,fragment的getActivity需继承CommonActivity*/
+    protected void showLoadingDialog(@Nullable CharSequence message) {
+        if (mActivity instanceof CommonActivity) {
+            ((CommonActivity) mActivity).showLoadingDialog(message);
+        }
+    }
+
+    /*消除加载框*/
+    protected void dismissLoadingDialog() {
+        if (mActivity instanceof CommonActivity) {
+            ((CommonActivity) mActivity).dismissLoadingDialog();
+        }
+    }
+
+    /*短时间显示Toast，子类也可以重写此方法自定义toast显示风格,fragment的getActivity需继承CommonActivity*/
+    protected void showShortToast(CharSequence text) {
+        if (mActivity instanceof CommonActivity) {
+            ((CommonActivity) mActivity).showShortToast(text);
+        }
+    }
+
+    /*长时间显示Toast，子类也可以重写此方法自定义toast显示风格,fragment的getActivity需继承CommonActivity*/
+    protected void showLongToast(CharSequence text) {
+        if (mActivity instanceof CommonActivity) {
+            ((CommonActivity) mActivity).showLongToast(text);
         }
     }
 }
