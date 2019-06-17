@@ -17,7 +17,8 @@ import android.view.WindowManager;
 public abstract class CommonDialog extends Dialog {
     protected Context mContext;
     protected View mContentView;
-    private int width, height = WindowManager.LayoutParams.WRAP_CONTENT; //默认height为自动填充
+    private int width = WindowManager.LayoutParams.WRAP_CONTENT,
+            height = WindowManager.LayoutParams.WRAP_CONTENT; //默认height为自动填充
     private int windowAnimations = -1;
     private Drawable background; //窗口背景drawable
     private int gravity = Gravity.CENTER;  //默认弹窗位置为屏幕中央
@@ -29,11 +30,22 @@ public abstract class CommonDialog extends Dialog {
     public CommonDialog(Context context, int themeResId) {
         super(context, themeResId);
         this.mContext = context;
-        setWidth(getScreenWidth(context) - context.getResources().getDimensionPixelSize(R.dimen.common_dialog_margin));
+//        setWidth(getCommonWidth());
+        mContentView = LayoutInflater.from(mContext).inflate(bindContentView(), null);
+        initView(mContentView);
+        setContentView(mContentView);
     }
 
-    private int getScreenWidth(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    protected int getCommonWidth() {
+        return getScreenWidth() - mContext.getResources().getDimensionPixelSize(R.dimen.common_dialog_margin);
+    }
+
+    public View getContentView() {
+        return mContentView;
+    }
+
+    private int getScreenWidth() {
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(outMetrics);
         return outMetrics.widthPixels;
@@ -100,9 +112,9 @@ public abstract class CommonDialog extends Dialog {
     }
 
     private void renderWindow(Window window) {
-        mContentView = LayoutInflater.from(mContext).inflate(bindContentView(), null);
-        initView(mContentView);
-        window.setContentView(mContentView);
+//        mContentView = LayoutInflater.from(mContext).inflate(bindContentView(), null);
+//        initView(mContentView);
+//        window.setContentView(mContentView);
         if (isFullScreen()) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         } else {

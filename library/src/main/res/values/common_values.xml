@@ -40,4 +40,15 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.2</item>
     </style>
+
+    <style name="CommonTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TranslucentStatusTheme" parent="CommonTheme" />
+
+    <style name="LightStatusBarTheme" parent="CommonTheme"/>
+
+    <style name="LightStatusBarTheme.TranslucentStatus" parent="TranslucentStatusTheme"/>
 </resources>

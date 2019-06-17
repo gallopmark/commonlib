@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TranslucentStatusTheme" parent="CommonTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="LightStatusBarTheme" parent="CommonTheme">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="LightStatusBarTheme.TranslucentStatus" parent="TranslucentStatusTheme">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

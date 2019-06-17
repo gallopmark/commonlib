@@ -2,31 +2,42 @@ package com.gallopmark.commom;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.gallopmark.commom.dialog.CommonLoadingDialog;
 import com.gallopmark.commom.dialog.IosLoadingDialog;
 import com.gallopmark.commom.toast.CommonToast;
+
+import java.util.List;
 
 /*activity基础类*/
 public abstract class CommonActivity extends AppCompatActivity {
@@ -42,26 +53,44 @@ public abstract class CommonActivity extends AppCompatActivity {
 
     private Dialog mLoadingDialog;
 
+    protected FragmentManager mFragmentManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(bindOrientation());
+        initializeWindow();
         setContentView(bindLayoutId());
+        setFragmentManager();
         initializeScreen();
         initialize(savedInstanceState);
         loadDataStart();
     }
 
+    /*setContentView之前调用，可以设置theme等*/
+    protected void initializeWindow() {
+
+    }
+
+    protected void setFragmentManager() {
+        mFragmentManager = getSupportFragmentManager();
+    }
+
     /*设置屏幕全屏或非全屏*/
     protected void initializeScreen() {
         if (isFullScreen()) {
-            SystemTintHelper.requestFullScreen(this);
+            SystemTintHelper.requestFullScreen(thisActivity);
         }
     }
 
     /*是否全屏*/
     protected boolean isFullScreen() {
         return false;
+    }
+
+    /*设置透明状态栏 6.0以上是否设置黑色字体*/
+    protected void setTransparentStatusBar(boolean isLightMode) {
+        SystemTintHelper.setTransparentStatusBar(thisActivity, isLightMode);
     }
 
     /*修改状态栏颜色*/
@@ -80,7 +109,7 @@ public abstract class CommonActivity extends AppCompatActivity {
 
     /*Android浅色状态栏黑色字体模式*/
     protected void setStatusBarLightMode() {
-        int result = SystemTintHelper.statusBarLightMode(thisActivity);
+        int result = SystemTintHelper.setStatusBarLightMode(thisActivity);
         if (!(result == 1 || result == 2 || result == 3) && BuildConfig.DEBUG) {
             Log.d("gallopmark", "This device does not support setStatusBarLightMode");
         }
@@ -89,6 +118,10 @@ public abstract class CommonActivity extends AppCompatActivity {
     /*当设置全屏沉浸状态栏时，一般使用此方法将toolbar等设置topMargin为statusHeight*/
     protected void addMarginTopEqualStatusBarHeight(@NonNull View view) {
         SystemTintHelper.addMarginTopEqualStatusBarHeight(thisActivity, view);
+    }
+
+    protected void subtractMarginTopEqualStatusBarHeight(@NonNull View view) {
+        SystemTintHelper.subtractMarginTopEqualStatusBarHeight(thisActivity, view);
     }
 
     /*设置屏幕方向*/
@@ -148,18 +181,23 @@ public abstract class CommonActivity extends AppCompatActivity {
 
     /*获取屏幕宽度*/
     protected int getScreenWidth() {
-        return getDisplayMetrics().widthPixels;
+        return getScreenSizePoint().x;
     }
 
     /*获取屏幕高度*/
     protected int getScreenHeight() {
-        return getDisplayMetrics().heightPixels;
+        return getScreenSizePoint().y;
     }
 
-    private DisplayMetrics getDisplayMetrics() {
-        DisplayMetrics metric = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metric);
-        return metric;
+    private Point getScreenSizePoint() {
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        Point point = new Point();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            wm.getDefaultDisplay().getRealSize(point);
+        } else {
+            wm.getDefaultDisplay().getSize(point);
+        }
+        return point;
     }
 
     /*启动activity*/
@@ -289,5 +327,105 @@ public abstract class CommonActivity extends AppCompatActivity {
     protected void showLongToast(CharSequence text) {
         if (!TextUtils.isEmpty(text))
             CommonToast.makeText(thisActivity, text, Toast.LENGTH_LONG).show();
+    }
+
+    /*fragment右侧滑入*/
+    protected void addFragment(@IdRes int containerId, Fragment fragment) {
+        addFragment(containerId, fragment, R.anim.fragment_from_right, 0);
+    }
+
+    protected void addFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        addFragment(containerId, fragment, null, enterAnim, outAnim);
+    }
+
+    protected void addFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
+        addFragment(containerId, fragment, tag, R.anim.fragment_from_right, 0);
+    }
+
+    /*取消fragment动画传入参数 enterAnim = 0 && outAnim == 0*/
+    protected void addFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, 0);
+        }
+        if (!TextUtils.isEmpty(tag)) {
+            transaction.add(containerId, fragment, tag);
+        } else {
+            transaction.add(containerId, fragment);
+        }
+        transaction.commitAllowingStateLoss();
+    }
+
+    /*replace fragment*/
+    protected void replaceFragment(@IdRes int containerId, Fragment fragment) {
+        replaceFragment(containerId, fragment, null);
+    }
+
+    protected void replaceFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        replaceFragment(containerId, fragment, null, enterAnim, outAnim);
+    }
+
+    protected void replaceFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
+        replaceFragment(containerId, fragment, tag, R.anim.fragment_from_right, 0);
+    }
+
+    protected void replaceFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, outAnim);
+        }
+        if (!TextUtils.isEmpty(tag)) {
+            transaction.replace(containerId, fragment, tag);
+        } else {
+            transaction.replace(containerId, fragment);
+        }
+        transaction.commitAllowingStateLoss();
+    }
+
+    protected void removeFragment(Fragment fragment) {
+        removeFragment(fragment, R.anim.fragment_from_right, R.anim.fragment_out_right);
+    }
+
+    protected void removeFragment(Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, outAnim);
+        }
+        transaction.remove(fragment).commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isFragmentPopBackStack()) {
+            onFragmentPopBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    /*当activity添加多个fragment时，点击返回键是否finish当前Activity，返回true退出当前activity，否则移除栈顶fragment*/
+    protected boolean isFragmentPopBackStack() {
+        return true;
+    }
+
+    protected void onFragmentPopBackStack() {
+        onFragmentPopBackStack(0, R.anim.fragment_out_right);
+    }
+
+    protected void onFragmentPopBackStack(@AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        List<Fragment> fragments = mFragmentManager.getFragments();
+        if (fragments.size() <= 1) {  //当前activity没有添加任何fragment或者只添加一个fragment，则直接结束当前activity
+            finish();
+        } else {
+            Fragment topFragment = fragments.get(fragments.size() - 1);
+            popBackStack(topFragment, enterAnim, outAnim);
+        }
+    }
+
+    protected void popBackStack(Fragment topFragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        removeFragment(topFragment, enterAnim, outAnim);
+        if (mFragmentManager.getBackStackEntryCount() > 0) {
+            mFragmentManager.popBackStack();
+        }
     }
 }

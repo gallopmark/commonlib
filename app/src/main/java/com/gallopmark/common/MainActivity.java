@@ -2,6 +2,8 @@ package com.gallopmark.common;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -18,28 +20,27 @@ import java.util.Random;
 public class MainActivity extends CommonActivity implements OnRequestPermissionsCallback {
 
     @Override
+    protected void initializeWindow() {
+        setTheme(R.style.LightStatusBarTheme_TranslucentStatus);
+    }
+
+    @Override
     protected int bindLayoutId() {
         return R.layout.activity_main;
     }
 
     @Override
-    protected boolean isFullScreen() {
-        return true;
-    }
-
-    @Override
     protected void initialize(@Nullable Bundle savedInstanceState) {
-        setStatusBarColor(R.color.colorAccent);
-        setStatusBarLightMode();
-        Button mButton = findViewById(R.id.mButton);
-        mButton.setOnClickListener(new View.OnClickListener() {
+//        setTransparentStatusBar(false);
+        addMarginTopEqualStatusBarHeight(findViewById(R.id.toolbar));
+//        addChildFragment(R.id.mContainer, new TestFragment1());
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                String[] array = {"XPopup", "BasePopup", "HouseLoading", "GifLoadingView"};
-                showLongToast(array[new Random().nextInt(array.length)]);
+            public void run() {
+                addFragment(R.id.mContainer, new TestFragment1());
             }
-        });
-        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE}, 2, this);
+        }, 1500);
+//        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE}, 2, this);
 //        new CommonLoadingDialog(this).setMessage("loading...").show();
 //        new IosLoadingDialog(this).setMessage("ios loading...").show();
         showLoadingDialog("loading...");

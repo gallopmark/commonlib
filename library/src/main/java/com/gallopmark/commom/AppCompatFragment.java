@@ -8,15 +8,21 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.AnimRes;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -34,10 +40,18 @@ public abstract class AppCompatFragment extends Fragment {
     /*权限申请回调*/
     private OnRequestPermissionsCallback requestCallback;
 
+    protected FragmentManager mChildFragmentManager;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mActivity = getActivity();
+        setChildFragmentManager();
+    }
+
+
+    protected void setChildFragmentManager() {
+        mChildFragmentManager = getChildFragmentManager();
     }
 
     protected <T extends View> T findViewById(View contentView, int id) {
@@ -211,5 +225,70 @@ public abstract class AppCompatFragment extends Fragment {
         if (mActivity instanceof CommonActivity) {
             ((CommonActivity) mActivity).showLongToast(text);
         }
+    }
+
+    /*add child fragment*/
+    protected void addChildFragment(@IdRes int containerId, Fragment fragment) {
+        addChildFragment(containerId, fragment, 0, 0);
+    }
+
+    protected void addChildFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        addChildFragment(containerId, fragment, null, enterAnim, outAnim);
+    }
+
+    protected void addChildFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
+        addChildFragment(containerId, fragment, tag, 0, 0);
+    }
+
+    /*取消fragment动画传入参数 enterAnim = 0 && outAnim == 0*/
+    protected void addChildFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mChildFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, 0);
+        }
+        if (!TextUtils.isEmpty(tag)) {
+            transaction.add(containerId, fragment, tag);
+        } else {
+            transaction.add(containerId, fragment);
+        }
+        transaction.commitAllowingStateLoss();
+    }
+
+    /*replace fragment*/
+    protected void replaceChildFragment(@IdRes int containerId, Fragment fragment) {
+        replaceChildFragment(containerId, fragment, null);
+    }
+
+    protected void replaceChildFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        replaceChildFragment(containerId, fragment, null, enterAnim, outAnim);
+    }
+
+    protected void replaceChildFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
+        replaceChildFragment(containerId, fragment, tag, 0, 0);
+    }
+
+    protected void replaceChildFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mChildFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, outAnim);
+        }
+        if (!TextUtils.isEmpty(tag)) {
+            transaction.replace(containerId, fragment, tag);
+        } else {
+            transaction.replace(containerId, fragment);
+        }
+        transaction.commitAllowingStateLoss();
+    }
+
+    protected void removeChildFragment(Fragment fragment) {
+        removeChildFragment(fragment, 0, 0);
+    }
+
+    protected void removeChildFragment(Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        FragmentTransaction transaction = mChildFragmentManager.beginTransaction();
+        if (enterAnim != 0 || outAnim != 0) {
+            transaction.setCustomAnimations(enterAnim, outAnim);
+        }
+        transaction.remove(fragment).commitAllowingStateLoss();
     }
 }

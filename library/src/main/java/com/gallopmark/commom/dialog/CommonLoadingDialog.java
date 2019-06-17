@@ -3,7 +3,6 @@ package com.gallopmark.commom.dialog;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.gallopmark.commom.CommonDialog;
@@ -15,11 +14,6 @@ public class CommonLoadingDialog extends CommonDialog {
 
     public CommonLoadingDialog(Context context) {
         super(context);
-    }
-
-    @Override
-    public int getWidth() {
-        return WindowManager.LayoutParams.WRAP_CONTENT;
     }
 
     public CharSequence getMessage() {
