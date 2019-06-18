@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+
 import com.gallopmark.commom.CommonFragment;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class TestFragment1 extends CommonFragment {
     }
 
     @Override
-    protected void bindView(View view) {
+    protected void bindView(@NonNull View view) {
 //        RecyclerView mRecyclerView = view.findViewById(R.id.mRecyclerView);
 //        List<String> list = new ArrayList<>();
 //        for (int i = 0; i < 50; i++) {
@@ -32,10 +33,16 @@ public class TestFragment1 extends CommonFragment {
 //        }
 //        TestAdapter adapter = new TestAdapter(list);
 //        mRecyclerView.setAdapter(adapter);
+        view.findViewById(R.id.mTextView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(SecondActivity.class);
+            }
+        });
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                addChildFragment(R.id.mContainer, new TestFragment2());
+//                addChildFragment(R.id.mContainer, new TestFragment2());
             }
         },1500);
     }

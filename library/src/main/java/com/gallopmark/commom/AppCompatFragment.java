@@ -1,6 +1,7 @@
 package com.gallopmark.commom;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +26,11 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.Toast;
+
+import com.gallopmark.commom.dialog.CommonLoadingDialog;
+import com.gallopmark.commom.dialog.IosLoadingDialog;
+import com.gallopmark.commom.toast.CommonToast;
 
 /*fragment基础类*/
 public abstract class AppCompatFragment extends Fragment {
@@ -42,13 +48,15 @@ public abstract class AppCompatFragment extends Fragment {
 
     protected FragmentManager mChildFragmentManager;
 
+    @Nullable
+    private Dialog mLoadingDialog;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mActivity = getActivity();
         setChildFragmentManager();
     }
-
 
     protected void setChildFragmentManager() {
         mChildFragmentManager = getChildFragmentManager();
@@ -69,7 +77,7 @@ public abstract class AppCompatFragment extends Fragment {
     }
 
     /*获取color值*/
-    protected int getColor(@ColorRes int id) {
+    protected int getColorCompat(@ColorRes int id) {
         return ContextCompat.getColor(mActivity, id);
     }
 
@@ -79,7 +87,7 @@ public abstract class AppCompatFragment extends Fragment {
     }
 
     /*获取drawable*/
-    protected Drawable getDrawable(@DrawableRes int id) {
+    protected Drawable getDrawableCompat(@DrawableRes int id) {
         return ContextCompat.getDrawable(mActivity, id);
     }
 
@@ -102,7 +110,7 @@ public abstract class AppCompatFragment extends Fragment {
         return mActivity.getResources().getIntArray(id);
     }
 
-    protected ColorStateList getColorStateList(@ColorRes int id) {
+    protected ColorStateList getColorStateListCompat(@ColorRes int id) {
         return ContextCompat.getColorStateList(mActivity, id);
     }
 
@@ -199,32 +207,47 @@ public abstract class AppCompatFragment extends Fragment {
         showLoadingDialog("");
     }
 
-    /*显示带message的加载框,fragment的getActivity需继承CommonActivity*/
+    /*显示带message的加载框*/
     protected void showLoadingDialog(@Nullable CharSequence message) {
-        if (mActivity instanceof CommonActivity) {
-            ((CommonActivity) mActivity).showLoadingDialog(message);
+        dismissLoadingDialog();
+        if (mLoadingDialog == null) {
+            mLoadingDialog = getLoadingDialog();
+        }
+        if (mLoadingDialog instanceof CommonLoadingDialog) {
+            ((CommonLoadingDialog) mLoadingDialog).setMessage(message).show();
+        } else {
+            mLoadingDialog.show();
         }
     }
 
     /*消除加载框*/
     protected void dismissLoadingDialog() {
-        if (mActivity instanceof CommonActivity) {
-            ((CommonActivity) mActivity).dismissLoadingDialog();
+        if (mLoadingDialog != null) {
+            mLoadingDialog.dismiss();
         }
     }
 
-    /*短时间显示Toast，子类也可以重写此方法自定义toast显示风格,fragment的getActivity需继承CommonActivity*/
+    /*默认加载框，子类重写此方法自定义loadingDialog*/
+    @NonNull
+    protected Dialog getLoadingDialog() {
+        return new IosLoadingDialog(mActivity);
+    }
+
+    /*设置自己的loadingDialog*/
+    public void setLoadingDialog(@NonNull Dialog mLoadingDialog) {
+        this.mLoadingDialog = mLoadingDialog;
+    }
+
+    /*短时间显示Toast，子类也可以重写此方法自定义toast显示风格*/
     protected void showShortToast(CharSequence text) {
-        if (mActivity instanceof CommonActivity) {
-            ((CommonActivity) mActivity).showShortToast(text);
-        }
+        if (!TextUtils.isEmpty(text))
+            CommonToast.makeText(mActivity, text, Toast.LENGTH_SHORT).show();
     }
 
-    /*长时间显示Toast，子类也可以重写此方法自定义toast显示风格,fragment的getActivity需继承CommonActivity*/
+    /*长时间显示Toast，子类也可以重写此方法自定义toast显示风格*/
     protected void showLongToast(CharSequence text) {
-        if (mActivity instanceof CommonActivity) {
-            ((CommonActivity) mActivity).showLongToast(text);
-        }
+        if (!TextUtils.isEmpty(text))
+            CommonToast.makeText(mActivity, text, Toast.LENGTH_LONG).show();
     }
 
     /*add child fragment*/

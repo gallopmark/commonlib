@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 /*viewpager中懒加载fragment*/
 public abstract class ViewPagerFragment extends AppCompatFragment {
 
-    protected View rootContainer;
+    protected View mRootContainer;
 
     private boolean isLazyLoaded = false;
     private boolean mViewInflateFinished = false;
@@ -18,23 +18,26 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
     @Nullable
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (rootContainer != null) {
-            mViewInflateFinished = true;
-            return rootContainer;
+        if (mRootContainer == null) {
+            mRootContainer = inflater.inflate(bindLayoutId(container, savedInstanceState), container, false);
+            bindView(mRootContainer);
         }
-        rootContainer = inflater.inflate(onLazyCreateView(container, savedInstanceState), container, false);
         mViewInflateFinished = true;
-        return rootContainer;
+        return mRootContainer;
     }
 
-    protected abstract int onLazyCreateView(@Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
+    protected abstract void bindView(@NonNull View contentView);
 
+    protected abstract int bindLayoutId(@Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
+
+    /*
+     * fragment在viewPager使用，采用全局变量赋值方法,
+     * kotlin插件引用view在onDestroyView方法执行后会抛出空指针异常，
+     * 原因是view已经解除绑定，类似ButterKnife unbind
+     */
     @Override
     public final void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (rootContainer == null) {
-            rootContainer = view;
-        }
         if (getUserVisibleHint()) {
             onLazyLoad();
         }
@@ -55,9 +58,10 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
         }
     }
 
-    protected <T extends View> T findViewById(int id) {
-        if (rootContainer == null) throw new NullPointerException("rootContainer not initialized");
-        return rootContainer.findViewById(id);
+    protected <T extends View> T obtainView(int id) {
+        if (mRootContainer == null)
+            throw new NullPointerException("mRootContainer not initialized");
+        return mRootContainer.findViewById(id);
     }
 
     /**

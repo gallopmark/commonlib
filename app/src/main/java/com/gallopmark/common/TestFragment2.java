@@ -3,6 +3,7 @@ package com.gallopmark.common;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class TestFragment2 extends CommonFragment {
     }
 
     @Override
-    protected void bindView(View view) {
+    protected void bindView(@NonNull View view) {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {

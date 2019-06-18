@@ -46,9 +46,119 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="CommonActivityAnimationTheme">
+        <item name="android:windowAnimationStyle">@style/CommonActivityAnimation</item>
+    </style>
+
+    <style name="ActivityAnimationDefault" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
+        <!--个activity还没有finish()下退出效果, 比如有俩个activity A与B 首先启动A 然后再启动B 那么A还没有finish()  这时A的退出效果。-->
+        <item name="android:activityCloseEnterAnimation">@anim/activity_close_enter</item>
+        <!--表示上一个activity返回进入效果 比如有俩个activity A与B  B在最上面，B退出(finish)后 A重新进入的效果。-->
+    </style>
+
+    <!--common activity animation right_in and right out-->
+    <style name="CommonActivityAnimation" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_right_in
+        </item> <!--一个activity创建进入的效果。-->
+        <item name="android:activityCloseExitAnimation">@anim/activity_right_out</item>
+        <!--表示的是activity finish()之后的效果 比如有俩个activity A与B B退出后会被finish() 那么B的退出效果在这定义。-->-->
+    </style>
+
+    <style name="ActivityRightInLeftOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityRightIn_LeftOut</item>
+    </style>
+
+    <!--common activity animation right_in and right out-->
+    <style name="ActivityRightIn_LeftOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_right_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_left_out</item>
+    </style>
+
+    <style name="ActivityLeftInLeftOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityLeftIn_LeftOut</item>
+    </style>
+
+    <style name="ActivityLeftIn_LeftOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_left_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_left_out</item>
+    </style>
+
+    <style name="ActivityLeftInRightOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityLeftIn_RightOut</item>
+    </style>
+
+    <style name="ActivityLeftIn_RightOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_left_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_right_out</item>
+    </style>
+
+    <style name="ActivityTopInTopOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityTopIn_TopOut</item>
+    </style>
+
+    <style name="ActivityTopIn_TopOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_top_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_bottom_to_top</item>
+    </style>
+
+    <style name="ActivityTopInBottomOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityTopIn_BottomOut</item>
+    </style>
+
+    <style name="ActivityTopIn_BottomOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_top_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_bottom_out</item>
+    </style>
+
+    <style name="ActivityBottomInBottomOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityBottomIn_BottomOut</item>
+    </style>
+
+    <style name="ActivityBottomIn_BottomOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_bottom_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_bottom_out</item>
+    </style>
+
+    <style name="ActivityBottomInTopOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityBottomIn_TopOut</item>
+    </style>
+
+    <style name="ActivityBottomIn_TopOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_bottom_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_bottom_to_top</item>
+    </style>
+
+    <style name="ActivityFadeInFadeOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityFadeIn_FadeOut</item>
+    </style>
+
+    <style name="ActivityFadeIn_FadeOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_fade_out</item>
+    </style>
+
+    <style name="ActivityScaleInScaleOutTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityScaleIn_ScaleOut</item>
+    </style>
+
+    <style name="ActivityScaleIn_ScaleOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_scale_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_scale_out</item>
+    </style>
+
+    <style name="ActivityRotateInRotateTheme" parent="CommonTheme">
+        <item name="android:windowAnimationStyle">@style/ActivityRotateIn_RotateOut</item>
+    </style>
+
+    <style name="ActivityRotateIn_RotateOut" parent="ActivityAnimationDefault">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_rotate_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_rotate_out</item>
+    </style>
+
     <style name="TranslucentStatusTheme" parent="CommonTheme" />
 
-    <style name="LightStatusBarTheme" parent="CommonTheme"/>
+    <style name="LightStatusBarTheme" parent="CommonTheme" />
 
-    <style name="LightStatusBarTheme.TranslucentStatus" parent="TranslucentStatusTheme"/>
+    <style name="LightStatusBarTheme.TranslucentStatus" parent="TranslucentStatusTheme" />
 </resources>

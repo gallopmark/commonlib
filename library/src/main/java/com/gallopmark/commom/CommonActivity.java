@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -37,6 +39,7 @@ import com.gallopmark.commom.dialog.CommonLoadingDialog;
 import com.gallopmark.commom.dialog.IosLoadingDialog;
 import com.gallopmark.commom.toast.CommonToast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*activity基础类*/
@@ -54,12 +57,19 @@ public abstract class CommonActivity extends AppCompatActivity {
     private Dialog mLoadingDialog;
 
     protected FragmentManager mFragmentManager;
+    @Nullable
+    private List<Fragment> mFragments;
+
+    protected int mActivityCloseEnterAnimation = -1;
+
+    protected int mActivityCloseExitAnimation = -1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(bindOrientation());
-        initializeWindow();
+        setupTheme();
+        setupWindow();
         setContentView(bindLayoutId());
         setFragmentManager();
         initializeScreen();
@@ -68,8 +78,22 @@ public abstract class CommonActivity extends AppCompatActivity {
     }
 
     /*setContentView之前调用，可以设置theme等*/
-    protected void initializeWindow() {
+    protected void setupTheme() {
 
+    }
+
+    /*activity动画兼容性,style 退出动画 解决退出动画无效问题*/
+    private void setupWindow() {
+        Resources.Theme theme = getTheme();
+        if (theme != null) {
+            TypedArray activityStyle = theme.obtainStyledAttributes(new int[]{android.R.attr.windowAnimationStyle});
+            int windowAnimationStyleResId = activityStyle.getResourceId(0, 0);
+            activityStyle.recycle();
+            activityStyle = theme.obtainStyledAttributes(windowAnimationStyleResId, new int[]{android.R.attr.activityCloseEnterAnimation, android.R.attr.activityCloseExitAnimation});
+            mActivityCloseEnterAnimation = activityStyle.getResourceId(0, 0);
+            mActivityCloseExitAnimation = activityStyle.getResourceId(1, 0);
+            activityStyle.recycle();
+        }
     }
 
     protected void setFragmentManager() {
@@ -86,6 +110,18 @@ public abstract class CommonActivity extends AppCompatActivity {
     /*是否全屏*/
     protected boolean isFullScreen() {
         return false;
+    }
+
+    /*设置屏幕方向*/
+    protected int bindOrientation() {
+        return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    }
+
+    protected abstract int bindLayoutId();
+
+    protected abstract void initialize(@Nullable Bundle savedInstanceState);
+
+    protected void loadDataStart() {
     }
 
     /*设置透明状态栏 6.0以上是否设置黑色字体*/
@@ -122,18 +158,6 @@ public abstract class CommonActivity extends AppCompatActivity {
 
     protected void subtractMarginTopEqualStatusBarHeight(@NonNull View view) {
         SystemTintHelper.subtractMarginTopEqualStatusBarHeight(thisActivity, view);
-    }
-
-    /*设置屏幕方向*/
-    protected int bindOrientation() {
-        return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-    }
-
-    protected abstract int bindLayoutId();
-
-    protected abstract void initialize(@Nullable Bundle savedInstanceState);
-
-    protected void loadDataStart() {
     }
 
     /*获取color*/
@@ -206,10 +230,10 @@ public abstract class CommonActivity extends AppCompatActivity {
     }
 
     /*启动activity，带bundle参数*/
-    protected void startActivity(@NonNull final Class<? extends Activity> clz, @Nullable Bundle bundle) {
+    protected void startActivity(@NonNull final Class<? extends Activity> clz, @Nullable Bundle extras) {
         Intent intent = obtainIntent(clz);
-        if (bundle != null) {
-            intent.putExtras(bundle);
+        if (extras != null) {
+            intent.putExtras(extras);
         }
         startActivity(intent);
     }
@@ -222,12 +246,12 @@ public abstract class CommonActivity extends AppCompatActivity {
         startActivityForResult(clz, requestCode, null, resultCallback);
     }
 
-    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode, @Nullable Bundle options, OnActivityResultCallback resultCallback) {
+    protected void startActivityForResult(@NonNull final Class<? extends Activity> clz, int requestCode, @Nullable Bundle extras, OnActivityResultCallback resultCallback) {
         this.mActivityRequestCode = requestCode;
         this.mActivityResultCallback = resultCallback;
         Intent intent = obtainIntent(clz);
-        if (options != null) {
-            intent.putExtras(options);
+        if (extras != null) {
+            intent.putExtras(extras);
         }
         startActivityForResult(intent, requestCode);
     }
@@ -354,6 +378,7 @@ public abstract class CommonActivity extends AppCompatActivity {
             transaction.add(containerId, fragment);
         }
         transaction.commitAllowingStateLoss();
+        addFragmentToList(fragment);
     }
 
     /*replace fragment*/
@@ -380,6 +405,7 @@ public abstract class CommonActivity extends AppCompatActivity {
             transaction.replace(containerId, fragment);
         }
         transaction.commitAllowingStateLoss();
+        addFragmentToList(fragment);
     }
 
     protected void removeFragment(Fragment fragment) {
@@ -392,13 +418,12 @@ public abstract class CommonActivity extends AppCompatActivity {
             transaction.setCustomAnimations(enterAnim, outAnim);
         }
         transaction.remove(fragment).commitAllowingStateLoss();
+        removeFragmentFromList(fragment);
     }
 
     @Override
     public void onBackPressed() {
-        if (isFragmentPopBackStack()) {
-            onFragmentPopBackStack();
-        } else {
+        if (!canFragmentPopBackStack()) {
             super.onBackPressed();
         }
     }
@@ -408,17 +433,17 @@ public abstract class CommonActivity extends AppCompatActivity {
         return true;
     }
 
-    protected void onFragmentPopBackStack() {
-        onFragmentPopBackStack(0, R.anim.fragment_out_right);
+    protected boolean canFragmentPopBackStack() {
+        return canFragmentPopBackStack(0, R.anim.fragment_out_right);
     }
 
-    protected void onFragmentPopBackStack(@AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
-        List<Fragment> fragments = mFragmentManager.getFragments();
-        if (fragments.size() <= 1) {  //当前activity没有添加任何fragment或者只添加一个fragment，则直接结束当前activity
-            finish();
+    protected boolean canFragmentPopBackStack(@AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
+        if (mFragments == null || mFragments.size() <= 1) {  //当前activity没有添加任何fragment或者只添加一个fragment，则直接结束当前activity
+            return false;
         } else {
-            Fragment topFragment = fragments.get(fragments.size() - 1);
+            Fragment topFragment = mFragments.get(mFragments.size() - 1);
             popBackStack(topFragment, enterAnim, outAnim);
+            return true;
         }
     }
 
@@ -426,6 +451,34 @@ public abstract class CommonActivity extends AppCompatActivity {
         removeFragment(topFragment, enterAnim, outAnim);
         if (mFragmentManager.getBackStackEntryCount() > 0) {
             mFragmentManager.popBackStack();
+        }
+    }
+
+    protected void addFragmentToList(Fragment fragment) {
+        if (mFragments == null) {
+            mFragments = new ArrayList<>();
+        }
+        mFragments.add(fragment);
+    }
+
+    protected void removeFragmentFromList(Fragment fragment) {
+        if (mFragments != null) {
+            mFragments.remove(fragment);
+        }
+    }
+
+    /*获取当前activity中addFragment or replaceFragment fragment总数*/
+    @NonNull
+    protected List<Fragment> getFragments() {
+        if (mFragments == null) return new ArrayList<>();
+        return mFragments;
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        if (mActivityCloseEnterAnimation != -1 || mActivityCloseExitAnimation != -1) {
+            overridePendingTransition(mActivityCloseEnterAnimation, mActivityCloseExitAnimation);
         }
     }
 }
