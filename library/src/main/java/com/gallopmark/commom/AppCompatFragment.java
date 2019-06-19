@@ -67,7 +67,7 @@ public abstract class AppCompatFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (mContentView == null) {
-            mContentView = inflater.inflate(bindLayoutId(), null, false);
+            mContentView = inflater.inflate(bindLayoutId(), container, false);
             bindView(mContentView);
         }
         isViewInflated = true;
