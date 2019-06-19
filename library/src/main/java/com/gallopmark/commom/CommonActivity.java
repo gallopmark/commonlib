@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.annotation.AnimRes;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.ArrayRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
@@ -129,21 +130,30 @@ public abstract class CommonActivity extends AppCompatActivity {
         SystemTintHelper.setTransparentStatusBar(thisActivity, isLightMode);
     }
 
-    /*修改状态栏颜色*/
-    protected void setStatusBarColor(@ColorRes int colorId) {
+    /*修改状态栏颜色 比如ContextCompat.getColor(context,R.color.colorPrimaryDark)*/
+    protected void setStatusBarColor(@ColorInt int colorId) {
+        setupStatusBarColor(colorId);
+    }
+
+    /*修改状态栏颜色 比如传入R.color.colorPrimaryDark*/
+    protected void setStatusBarColorResource(@ColorRes int colorResId) {
+        setupStatusBarColor(getColorCompat(colorResId));
+    }
+
+    private void setupStatusBarColor(int color) {
         if (!isFullScreen()) {
-            SystemTintHelper.setStatusBarColor(thisActivity, getColorCompat(colorId));
+            SystemTintHelper.setStatusBarColor(thisActivity, color);
         } else {
             View statusView = findViewById(R.id.statusBarView);
-            if (statusView != null && colorId != 0) {
+            if (statusView != null && color != 0) {
                 ViewGroup.LayoutParams params = statusView.getLayoutParams();
                 params.height = getStatusBarHeight();
-                statusView.setBackgroundResource(colorId);
+                statusView.setBackgroundColor(color);
             }
         }
     }
 
-    /*Android浅色状态栏黑色字体模式*/
+    /*Android浅色状态栏黑色字体模式 如果调用了setStatusBarColor方法，则须在setStatusBarColor方法后执行，否则无效*/
     protected void setStatusBarLightMode() {
         int result = SystemTintHelper.setStatusBarLightMode(thisActivity);
         if (!(result == 1 || result == 2 || result == 3) && BuildConfig.DEBUG) {

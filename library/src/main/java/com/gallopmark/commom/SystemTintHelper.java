@@ -22,14 +22,14 @@ public class SystemTintHelper {
      * @return 1:MIUUI 2:Flyme 3:android6.0
      */
     static int setStatusBarLightMode(Activity activity) {
-      return setStatusBarLightMode(activity.getWindow());
+        return setStatusBarLightMode(activity.getWindow());
     }
 
-    private static int setStatusBarLightMode(Window window){
+    private static int setStatusBarLightMode(Window window) {
         int result = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                 result = 3;
             } else {
                 if (MIUISetStatusBarLightMode(window, true)) {
@@ -41,6 +41,7 @@ public class SystemTintHelper {
         }
         return result;
     }
+
 
     /**
      * 已知系统类型时，设置状态栏黑色文字、图标。
@@ -56,7 +57,7 @@ public class SystemTintHelper {
             flyMeSetStatusBarLightMode(activity.getWindow(), true);
         } else if (type == 3) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
         }
     }
@@ -136,7 +137,7 @@ public class SystemTintHelper {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //开发版 7.7.13 及以后版本采用了系统API，旧方法无效但不会报错，所以两个方式都要加上
                     if (dark) {
-                        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                     } else {
                         window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                     }
@@ -224,7 +225,7 @@ public class SystemTintHelper {
         Window window = activity.getWindow();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            int option = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_VISIBLE;
             if (isLightMode) {
                 setStatusBarLightMode(window);
             } else {

@@ -12,6 +12,12 @@ import com.gallopmark.commom.OnRequestPermissionsCallback;
 public class MainActivity extends CommonActivity implements OnRequestPermissionsCallback {
 
     @Override
+    protected void setupTheme() {
+        setStatusBarColor(getColorCompat(R.color.colorAccent));
+        setStatusBarLightMode();
+    }
+
+    @Override
     protected int bindLayoutId() {
         return R.layout.activity_main;
     }
