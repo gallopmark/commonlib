@@ -17,7 +17,7 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
 
     @Nullable
     @Override
-    public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (mRootContainer == null) {
             mRootContainer = inflater.inflate(bindLayoutId(container, savedInstanceState), container, false);
             bindView(mRootContainer);
@@ -36,7 +36,7 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
      * 原因是view已经解除绑定，类似ButterKnife unbind
      */
     @Override
-    public final void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getUserVisibleHint()) {
             onLazyLoad();
