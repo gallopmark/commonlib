@@ -1,10 +1,8 @@
 package com.gallopmark.common;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +17,7 @@ import java.util.List;
 public class TestFragment1 extends CommonFragment {
 
     @Override
-    protected int bindLayoutId(@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    protected int bindLayoutId() {
         return R.layout.fragment_test;
     }
 

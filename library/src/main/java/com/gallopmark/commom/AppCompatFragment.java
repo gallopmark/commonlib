@@ -61,15 +61,15 @@ public abstract class AppCompatFragment extends Fragment {
         super.onAttach(context);
         this.mActivity = getActivity();
         setChildFragmentManager();
-        if (mContentView == null) {
-            mContentView = LayoutInflater.from(context).inflate(bindLayoutId(), null, false);
-            bindView(mContentView);
-        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (mContentView == null) {
+            mContentView = inflater.inflate(bindLayoutId(), null, false);
+            bindView(mContentView);
+        }
         isViewInflated = true;
         return mContentView;
     }
