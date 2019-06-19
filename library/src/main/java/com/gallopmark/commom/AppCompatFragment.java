@@ -25,7 +25,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.gallopmark.commom.dialog.CommonLoadingDialog;
@@ -36,6 +38,8 @@ import com.gallopmark.commom.toast.CommonToast;
 public abstract class AppCompatFragment extends Fragment {
     /*全局mActivity避免getActivity空指针异常*/
     protected Activity mActivity;
+    protected View mContentView;
+    protected boolean isViewInflated = false;
 
     /*startActivityForResult请求码*/
     private int mActivityRequestCode;
@@ -51,19 +55,37 @@ public abstract class AppCompatFragment extends Fragment {
     @Nullable
     private Dialog mLoadingDialog;
 
+    /*onAttach方法在viewPager中只执行一次，保证onCreateView唯一性*/
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.mActivity = getActivity();
         setChildFragmentManager();
+        if (mContentView == null) {
+            mContentView = LayoutInflater.from(context).inflate(bindLayoutId(), null, false);
+            bindView(mContentView);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        isViewInflated = true;
+        return mContentView;
     }
 
     protected void setChildFragmentManager() {
         mChildFragmentManager = getChildFragmentManager();
     }
 
-    protected <T extends View> T findViewById(View contentView, int id) {
-        return contentView.findViewById(id);
+    protected abstract int bindLayoutId();
+
+    protected abstract void bindView(@NonNull View view);
+
+    /*if you use kotlin, No need to use obtainView*/
+    protected <T extends View> T obtainView(int id) {
+        if (mContentView == null) throw new NullPointerException("mContentView not initialized");
+        return mContentView.findViewById(id);
     }
 
     /*getResources*/
@@ -313,5 +335,11 @@ public abstract class AppCompatFragment extends Fragment {
             transaction.setCustomAnimations(enterAnim, outAnim);
         }
         transaction.remove(fragment).commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onDestroyView() {
+        isViewInflated = false;
+        super.onDestroyView();
     }
 }

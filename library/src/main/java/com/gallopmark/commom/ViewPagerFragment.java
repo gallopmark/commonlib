@@ -10,25 +10,7 @@ import android.view.ViewGroup;
 /*viewpager中懒加载fragment*/
 public abstract class ViewPagerFragment extends AppCompatFragment {
 
-    protected View mRootContainer;
-
     private boolean isLazyLoaded = false;
-    private boolean mViewInflateFinished = false;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (mRootContainer == null) {
-            mRootContainer = inflater.inflate(bindLayoutId(container, savedInstanceState), container, false);
-            bindView(mRootContainer);
-        }
-        mViewInflateFinished = true;
-        return mRootContainer;
-    }
-
-    protected abstract void bindView(@NonNull View contentView);
-
-    protected abstract int bindLayoutId(@Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
 
     /*
      * fragment在viewPager使用，采用全局变量赋值方法,
@@ -52,16 +34,10 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
     }
 
     private void onLazyLoad() {
-        if (!isLazyLoaded && mViewInflateFinished) {
+        if (!isLazyLoaded && isViewInflated) {
             loadDataStart();
             isLazyLoaded = true;
         }
-    }
-
-    protected <T extends View> T obtainView(int id) {
-        if (mRootContainer == null)
-            throw new NullPointerException("mRootContainer not initialized");
-        return mRootContainer.findViewById(id);
     }
 
     /**
@@ -69,11 +45,5 @@ public abstract class ViewPagerFragment extends AppCompatFragment {
      */
     protected void loadDataStart() {
 
-    }
-
-    @Override
-    public void onDestroyView() {
-        mViewInflateFinished = false;
-        super.onDestroyView();
     }
 }
