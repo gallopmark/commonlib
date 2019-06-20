@@ -99,38 +99,9 @@ public class WrapperToolbar extends Toolbar {
         } else {
             lp = (LayoutParams) vlp;
         }
+        lp.gravity = Gravity.CENTER;
         lp.setMargins(getTitleMarginStart(), getTitleMarginTop(), getTitleMarginEnd(), getTitleMarginBottom());
         addView(v, lp);
-    }
-
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        LayoutParams lp = new LayoutParams(getContext(), attrs);
-        lp.gravity = Gravity.CENTER;
-        return lp;
-    }
-
-    @Override
-    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        LayoutParams lp;
-        if (p instanceof LayoutParams) {
-            lp = new LayoutParams((LayoutParams) p);
-        } else if (p instanceof ActionBar.LayoutParams) {
-            lp = new LayoutParams((ActionBar.LayoutParams) p);
-        } else if (p instanceof MarginLayoutParams) {
-            lp = new LayoutParams((MarginLayoutParams) p);
-        } else {
-            lp = new LayoutParams(p);
-        }
-        lp.gravity = Gravity.CENTER;
-        return lp;
-    }
-
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
-        return lp;
     }
 
     @Override
