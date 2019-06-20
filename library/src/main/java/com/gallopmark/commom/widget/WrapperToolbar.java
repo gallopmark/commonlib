@@ -1,13 +1,12 @@
 package com.gallopmark.commom.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.TintTypedArray;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import android.support.v7.appcompat.R;
 
 import java.lang.reflect.Field;
 
@@ -25,36 +23,31 @@ public class WrapperToolbar extends Toolbar {
 
     private TextView mTitleTextView;
     private CharSequence mTitleText;
-    private int mTitleTextColor = 0;
-    private int mTitleTextAppearance = 0;
 
     public WrapperToolbar(Context context) {
         super(context);
-        resolveAttribute(context, null, R.attr.toolbarStyle);
+        resolveAttribute(context);
     }
 
     public WrapperToolbar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        resolveAttribute(context, attrs, R.attr.toolbarStyle);
+        resolveAttribute(context);
     }
 
     public WrapperToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        resolveAttribute(context, attrs, R.attr.toolbarStyle);
+        resolveAttribute(context);
     }
 
-    @SuppressLint("RestrictedApi,PrivateResource")
-    private void resolveAttribute(Context context, AttributeSet attrs, int defStyleAttr) {
-        TintTypedArray a = TintTypedArray.obtainStyledAttributes(context, attrs, R.styleable.Toolbar, defStyleAttr, 0);
-        int titleTextAppearance = a.getResourceId(R.styleable.Toolbar_titleTextAppearance, 0);
+    private void resolveAttribute(Context context) {
+        int titleTextAppearance = getTitleTextAppearance();
         if (titleTextAppearance != 0) {
             setTitleTextAppearance(context, titleTextAppearance);
         }
-        int titleTextColor = a.getColor(R.styleable.Toolbar_titleTextColor, 0);
+        int titleTextColor = getTitleTextColor();
         if (titleTextColor != 0) {
             setTitleTextColor(titleTextColor);
         }
-        a.recycle();
         post(new Runnable() {
             @Override
             public void run() {
@@ -77,11 +70,11 @@ public class WrapperToolbar extends Toolbar {
                 mTitleTextView = new AppCompatTextView(getContext());
                 mTitleTextView.setSingleLine();
                 mTitleTextView.setEllipsize(TextUtils.TruncateAt.END);
-                if (mTitleTextAppearance != 0) {
-                    TextViewCompat.setTextAppearance(mTitleTextView, mTitleTextAppearance);
+                if (getTitleTextAppearance() != 0) {
+                    TextViewCompat.setTextAppearance(mTitleTextView, getTitleTextAppearance());
                 }
-                if (mTitleTextColor != 0) {
-                    mTitleTextView.setTextColor(mTitleTextColor);
+                if (getTitleTextColor() != 0) {
+                    mTitleTextView.setTextColor(getTitleTextColor());
                 }
             }
             if (mTitleTextView.getParent() != this) {
@@ -142,7 +135,6 @@ public class WrapperToolbar extends Toolbar {
 
     @Override
     public void setTitleTextAppearance(Context context, int resId) {
-        mTitleTextAppearance = resId;
         if (mTitleTextView != null) {
             TextViewCompat.setTextAppearance(mTitleTextView, resId);
         }
@@ -150,7 +142,6 @@ public class WrapperToolbar extends Toolbar {
 
     @Override
     public void setTitleTextColor(int color) {
-        mTitleTextColor = color;
         if (mTitleTextView != null) {
             mTitleTextView.setTextColor(color);
         }
@@ -173,21 +164,49 @@ public class WrapperToolbar extends Toolbar {
     }
 
     private void setCenter(String fieldName) {
+        Object obj = getField(fieldName);//拿到对应的Object
+        if (obj == null) return;
+        if (obj instanceof View) {
+            ViewGroup.LayoutParams lp = ((View) obj).getLayoutParams();//拿到LayoutParams
+            if (lp instanceof ActionBar.LayoutParams) {
+                ((ActionBar.LayoutParams) lp).gravity = Gravity.CENTER;//设置居中
+                ((View) obj).setLayoutParams(lp);
+            }
+        }
+    }
+
+    /*通过反射获取titleTextColor*/
+    protected int getTitleTextColor() {
+        return getFieldIntValue("mTitleTextColor");
+    }
+
+    /*通过反射获取mTitleTextAppearance*/
+    protected int getTitleTextAppearance() {
+        return getFieldIntValue("mTitleTextAppearance");
+    }
+
+    private int getFieldIntValue(String fieldName) {
+        Object obj = getField(fieldName);
+        if (obj == null) {
+            return 0;
+        }
         try {
-            if (getClass().getSuperclass() == null) return;
+            return (int) obj;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /*通过反射获取属性值*/
+    @Nullable
+    protected Object getField(@NonNull String fieldName) {
+        try {
+            if (getClass().getSuperclass() == null) return null;
             Field field = getClass().getSuperclass().getDeclaredField(fieldName);//反射得到父类Field
             field.setAccessible(true);
-            Object obj = field.get(this);//拿到对应的Object
-            if (obj == null) return;
-            if (obj instanceof View) {
-                ViewGroup.LayoutParams lp = ((View) obj).getLayoutParams();//拿到LayoutParams
-                if (lp instanceof ActionBar.LayoutParams) {
-                    ((ActionBar.LayoutParams) lp).gravity = Gravity.CENTER;//设置居中
-                    ((View) obj).setLayoutParams(lp);
-                }
-            }
+            return field.get(this);
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
     }
 }
