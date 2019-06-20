@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gallopmark.commom.R;
+import android.support.v7.appcompat.R;
 
 import java.lang.reflect.Field;
 
