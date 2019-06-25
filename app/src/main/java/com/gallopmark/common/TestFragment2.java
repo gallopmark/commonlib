@@ -2,7 +2,7 @@ package com.gallopmark.common;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.gallopmark.commom.CommonFragment;

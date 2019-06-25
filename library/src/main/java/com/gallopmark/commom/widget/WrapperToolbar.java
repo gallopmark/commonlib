@@ -2,12 +2,12 @@ package com.gallopmark.commom.widget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.TextViewCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.widget.TextViewCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -21,8 +21,8 @@ import java.lang.reflect.Field;
 /*自定义toolbar解决标题居中，NavButtonView和MenuView一起居中*/
 public class WrapperToolbar extends Toolbar {
 
-    private TextView mTitleTextView;
-    private CharSequence mTitleText;
+    private TextView mTitleTextView;  //title textView
+    private CharSequence mTitleText;    //title text
 
     public WrapperToolbar(Context context) {
         super(context);
@@ -78,7 +78,7 @@ public class WrapperToolbar extends Toolbar {
                 }
             }
             if (mTitleTextView.getParent() != this) {
-                addCenterView(mTitleTextView);
+                addTitleCenter(mTitleTextView);
             }
         } else if (mTitleTextView != null && mTitleTextView.getParent() == this) {// 当title为空时，remove
             removeView(mTitleTextView);
@@ -89,7 +89,7 @@ public class WrapperToolbar extends Toolbar {
         mTitleText = title;
     }
 
-    private void addCenterView(View v) {
+    private void addTitleCenter(View v) {
         ViewGroup.LayoutParams vlp = v.getLayoutParams();
         LayoutParams lp;
         if (vlp == null) {
@@ -116,6 +116,11 @@ public class WrapperToolbar extends Toolbar {
         if (mTitleTextView != null) {
             mTitleTextView.setTextColor(color);
         }
+    }
+
+    @Nullable
+    public TextView getTitleTextView() {
+        return mTitleTextView;
     }
 
     @Override
@@ -156,7 +161,8 @@ public class WrapperToolbar extends Toolbar {
         return getFieldIntValue("mTitleTextAppearance");
     }
 
-    private int getFieldIntValue(String fieldName) {
+    /*通过反射获取int属性变量值*/
+    protected int getFieldIntValue(String fieldName) {
         Object obj = getField(fieldName);
         if (obj == null) {
             return 0;

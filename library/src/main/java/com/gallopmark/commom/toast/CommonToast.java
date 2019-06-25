@@ -2,10 +2,12 @@ package com.gallopmark.commom.toast;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
-import android.support.v4.view.ViewCompat;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.core.view.ViewCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,8 +19,7 @@ import com.gallopmark.commom.R;
 
 import java.lang.reflect.Field;
 
-/*自定义toast 解决toast频繁显示的问题
- * */
+/*自定义toast 解决toast频繁显示的问题 */
 public class CommonToast {
 
     /*自定义toast动画*/
@@ -92,15 +93,18 @@ public class CommonToast {
             this(mContext.getString(resId));
         }
 
+        /*构造方法带toast文本*/
         FluentInitializer(CharSequence text) {
             mToastTextView.setText(text);
         }
 
+        /*设置toast动画*/
         public FluentInitializer setWindowAnimations(int windowAnimations) {
             mWindowAnimations = windowAnimations;
             return this;
         }
 
+        /*设置toast文本边距*/
         public FluentInitializer setContentPadding(int left, int top, int right, int bottom) {
             mContentView.setPadding(left, top, right, bottom);
             return this;
@@ -111,11 +115,13 @@ public class CommonToast {
             return this;
         }
 
+        /*设置toast窗口背景颜色*/
         public FluentInitializer setBackgroundColor(@ColorInt int color) {
             mContentView.setBackgroundColor(color);
             return this;
         }
 
+        /*设置toast窗口背景*/
         public FluentInitializer setBackgroundResource(@DrawableRes int resId) {
             mContentView.setBackgroundResource(resId);
             return this;
@@ -133,22 +139,26 @@ public class CommonToast {
             return this;
         }
 
+        /*设置文本颜色*/
         public FluentInitializer setTextColor(@ColorInt int color) {
             mToastTextView.setTextColor(color);
             return this;
         }
 
+        /*设置toast时长*/
         public FluentInitializer setDuration(int duration) {
             mDuration = duration;
             return this;
         }
 
+        /*设置toast gravity*/
         public FluentInitializer setGravity(int gravity) {
             mGravity = gravity;
 //            mToast.setGravity(gravity, 0, 0);
             return this;
         }
 
+        /*设置toast margin*/
         public FluentInitializer setMargin(float horizontalMargin, float verticalMargin) {
             mHorizontalMargin = horizontalMargin;
             mVerticalMargin = verticalMargin;

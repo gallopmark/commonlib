@@ -1,6 +1,6 @@
 package com.gallopmark.commom;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface OnRequestPermissionsCallback {
     void onGranted(int requestCode, @NonNull String[] permissions);

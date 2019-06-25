@@ -2,7 +2,7 @@ package com.gallopmark.commom;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 
 /*application通用类，解决multiDexException*/
 public abstract class CommonApplication extends Application {

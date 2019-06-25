@@ -13,22 +13,24 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.AnimRes;
-import android.support.annotation.AnimatorRes;
-import android.support.annotation.ArrayRes;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DimenRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.AnimRes;
+import androidx.annotation.AnimatorRes;
+import androidx.annotation.ArrayRes;
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DimenRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -363,17 +365,19 @@ public abstract class CommonActivity extends AppCompatActivity {
             CommonToast.makeText(thisActivity, text, Toast.LENGTH_LONG).show();
     }
 
-    /*fragment右侧滑入*/
+    /*add fragment*/
     protected void addFragment(@IdRes int containerId, Fragment fragment) {
-        addFragment(containerId, fragment, R.anim.fragment_from_right, 0);
+        addFragment(containerId, fragment, 0, 0);
     }
 
+    /*add fragment with anim*/
     protected void addFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
         addFragment(containerId, fragment, null, enterAnim, outAnim);
     }
 
+    /*add fragment with tag*/
     protected void addFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
-        addFragment(containerId, fragment, tag, R.anim.fragment_from_right, 0);
+        addFragment(containerId, fragment, tag, 0, 0);
     }
 
     /*取消fragment动画传入参数 enterAnim = 0 && outAnim == 0*/
@@ -396,12 +400,14 @@ public abstract class CommonActivity extends AppCompatActivity {
         replaceFragment(containerId, fragment, null);
     }
 
+    /*replace fragment with anim*/
     protected void replaceFragment(@IdRes int containerId, Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
         replaceFragment(containerId, fragment, null, enterAnim, outAnim);
     }
 
+    /*replace fragment with tag*/
     protected void replaceFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag) {
-        replaceFragment(containerId, fragment, tag, R.anim.fragment_from_right, 0);
+        replaceFragment(containerId, fragment, tag, 0, 0);
     }
 
     protected void replaceFragment(@IdRes int containerId, Fragment fragment, @Nullable String tag, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
@@ -418,10 +424,12 @@ public abstract class CommonActivity extends AppCompatActivity {
         addFragmentToList(fragment);
     }
 
+    /*remove fragment*/
     protected void removeFragment(Fragment fragment) {
-        removeFragment(fragment, R.anim.fragment_from_right, R.anim.fragment_out_right);
+        removeFragment(fragment, 0, 0);
     }
 
+    /*remove fragment with anim*/
     protected void removeFragment(Fragment fragment, @AnimatorRes @AnimRes int enterAnim, @AnimatorRes @AnimRes int outAnim) {
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         if (enterAnim != 0 || outAnim != 0) {
@@ -464,6 +472,7 @@ public abstract class CommonActivity extends AppCompatActivity {
         }
     }
 
+    /*add fragment to list*/
     protected void addFragmentToList(Fragment fragment) {
         if (mFragments == null) {
             mFragments = new ArrayList<>();
@@ -471,6 +480,7 @@ public abstract class CommonActivity extends AppCompatActivity {
         mFragments.add(fragment);
     }
 
+    /*remove fragment from list*/
     protected void removeFragmentFromList(Fragment fragment) {
         if (mFragments != null) {
             mFragments.remove(fragment);
@@ -484,6 +494,7 @@ public abstract class CommonActivity extends AppCompatActivity {
         return mFragments;
     }
 
+    /*解决activity退出动画无效问题*/
     @Override
     public void finish() {
         super.finish();
